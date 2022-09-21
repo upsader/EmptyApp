@@ -40,6 +40,11 @@ app.Run(async (context) =>
         string? id = path.Value?.Split("/")[3];
         await DeleteUser(id, response);
     }
+    else
+    {
+        response.ContentType = "text/html; charset=utf-8";
+        await response.SendFileAsync("html/index.html");
+    }
 
 });
 
@@ -50,23 +55,19 @@ app.Run();
 
 async Task DeleteUser(string id, HttpResponse response)
 {
-    try
-    {
+    
         Person? user = users.FirstOrDefault(u => u.Id == id);
         if (user != null)
         {
             users.Remove(user);
+            await response.WriteAsJsonAsync(user);
         }
         else
         {
-            throw new Exception("User not found(delete)");
+            response.StatusCode = 400;
+            await response.WriteAsJsonAsync(new { message = "Wrong Data(delete)" });
         }
-    }
-    catch (Exception ex)
-    {
-        response.StatusCode = 400;
-        await response.WriteAsJsonAsync(new { message = "Wrong Data(delete)" });
-    }
+    
 }
 
 async Task CreatePerson(HttpResponse response, HttpRequest request)
@@ -128,8 +129,13 @@ async Task UpdatePerson(HttpResponse response, HttpRequest request)
             }
             else
             {
-                throw new Exception("User not found");
+                response.StatusCode = 404;
+                await response.WriteAsJsonAsync(new { message = "User not found" });
             }
+        }
+        else
+        {
+            throw new Exception("Wrong data(update)");
         }
     }
     catch (Exception ex)

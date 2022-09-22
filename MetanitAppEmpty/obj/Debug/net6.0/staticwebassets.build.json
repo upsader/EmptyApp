@@ -1,11 +1,19 @@
 {
   "Version": 1,
-  "Hash": "qpKT25WMcvtnoC//6rnkgnenxAJ4cbbG6REcDke14nM=",
+  "Hash": "OmkzjMjOiJUijrt/bi97mmvYFfUsQzyJ4E7JOqZZWw4=",
   "Source": "MetanitAppEmpty",
   "BasePath": "_content/MetanitAppEmpty",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "MetanitAppEmpty\\wwwroot",
+      "Source": "MetanitAppEmpty",
+      "ContentRoot": "C:\\Users\\olegs\\source\\repos\\MetanitAppEmpty\\MetanitAppEmpty\\wwwroot\\",
+      "BasePath": "_content/MetanitAppEmpty",
+      "Pattern": "**"
+    }
+  ],
   "Assets": []
 }

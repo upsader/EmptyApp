@@ -19,3 +19,4 @@ C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\obj\Debug\net6.0\ref
 C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\obj\Debug\net6.0\MetanitAppEmpty.pdb
 C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\obj\Debug\net6.0\MetanitAppEmpty.genruntimeconfig.cache
 C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\obj\Debug\net6.0\ref\MetanitAppEmpty.dll
+C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\bin\Debug\net6.0\MetanitAppEmpty.staticwebassets.runtime.json

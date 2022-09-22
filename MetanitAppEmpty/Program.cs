@@ -1,6 +1,107 @@
 ﻿using MetanitAppEmpty;
+using System.Text;
 using System.Text.RegularExpressions;
 
+var builder = WebApplication.CreateBuilder(args);
+
+//builder.Services.Configure<RouteOptions>(options =>
+//    options.ConstraintMap.Add("secretcode", typeof(SecretCodeConstraint)));
+
+// альтернативное добавление класса ограничения
+//builder.Services.AddRouting(options => options.ConstraintMap.Add("invalidnames", typeof(InvalidNamesConstraint)));
+
+//builder.Services.AddTransient<ITimer, Timer>();
+//builder.Services.AddTransient<TimeService>();
+//builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
+//{
+//    {"name", "Tom" },
+//    {"age", "Surv" }
+//});
+
+var app = builder.Build();
+
+
+
+//app.Map("/", builder =>
+//{
+//    builder.Run(async (context) => await context.Response.WriteAsync("awd"));
+//});
+
+app.Map("/", (IConfiguration appConfig) => $"{appConfig["name"]} - {appConfig["age"]}");
+
+app.Use(async (context, next) =>
+{
+    await next();
+
+});
+
+app.Run();
+
+app.Map("/time", (TimeService service) => $"Time: {service.GetTime()}");
+
+//app.Map("/users/{name:invalidnames}", (string name) => $"Name: {name}");
+
+//app.Map(
+//        "/users/{name}/{token:secretcode(123466)}/",
+//        (string name, int token) => $"Name: {name} \nToken: {token}"
+//    );
+//app.Map(
+//    "/phonebook/{phone:regex(^7-\\d{{3}}-\\d{{3}}-\\d{{4}}$)}/",
+//    (string phone) => $"Phone: {phone}"
+//);
+//app.Map("/", () => "Index Page");
+
+
+//app.MapGet("/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
+//{
+//    var sb = new StringBuilder();
+//    var endpoints = endpointSources.SelectMany(es => es.Endpoints);
+//    foreach (var endpoint in endpoints)
+//    {
+//        sb.AppendLine(endpoint.DisplayName);
+
+//        // получим конечную точку как RouteEndpoint
+//        if (endpoint is RouteEndpoint routeEndpoint)
+//        {
+//            sb.AppendLine(routeEndpoint.RoutePattern.RawText);
+//        }
+
+//        // получение метаданных
+//        // данные маршрутизации
+//        var routeNameMetadata = endpoint.Metadata.OfType<Microsoft.AspNetCore.Routing.RouteNameMetadata>().FirstOrDefault();
+//        var routeName = routeNameMetadata?.RouteName;
+//        // данные http - поддерживаемые типы запросов
+//        var httpMethodsMetadata = endpoint.Metadata.OfType<HttpMethodMetadata>().FirstOrDefault();
+//        var httpMethods = httpMethodsMetadata?.HttpMethods; // [GET, POST, ...]
+//    }
+//    return sb.ToString();
+//});
+
+
+public class InvalidNamesConstraint : IRouteConstraint
+{
+    string[] names = new[] { "Tom", "Sam", "Bob" };
+    public bool Match(HttpContext? httpContext, IRouter? route, string routeKey,
+        RouteValueDictionary values, RouteDirection routeDirection)
+    {
+        return !names.Contains(values[routeKey]?.ToString());
+    }
+}
+
+public class SecretCodeConstraint : IRouteConstraint
+{
+    string secretCode;
+
+    public SecretCodeConstraint(string secretCode)
+    {
+        this.secretCode = secretCode;
+    }
+
+    public bool Match(HttpContext? httpContext, IRouter? route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
+    {
+        return values[routeKey]?.ToString() == secretCode;
+    }
+}
 
 //List<Person> users = new List<Person>
 //{
@@ -9,9 +110,9 @@ using System.Text.RegularExpressions;
 //    new() {Id = Guid.NewGuid().ToString(), Name = "Sam", Age = 33}
 //};
 
-var builder = WebApplication.CreateBuilder(args);
+//var builder = WebApplication.CreateBuilder(args);
 
-//Dva objekta dlja odnoj zavisimosti
+//Dva objekta dlja odnoj zavisimosti!!!!!!!!!!!!
 //builder.Services.AddTransient<IHelloService, RuHelloService>();
 //builder.Services.AddTransient<IHelloService, EnHelloService>();
 
@@ -19,19 +120,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 //app.UseMiddleware<HelloMiddleware>();
 
-//Odin object dlja neskolkih zavisimostrej
-builder.Services.AddSingleton<ValueStorage>();
-builder.Services.AddSingleton<IGenerator>(service => service.GetRequiredService<ValueStorage>());
-builder.Services.AddSingleton<IReader>(service => service.GetRequiredService<ValueStorage>());
+//Odin object dlja neskolkih zavisimostrej!!!!!!!!!!!!!!
+//builder.Services.AddSingleton<ValueStorage>();
+//builder.Services.AddSingleton<IGenerator>(service => service.GetRequiredService<ValueStorage>());
+//builder.Services.AddSingleton<IReader>(service => service.GetRequiredService<ValueStorage>());
 
-var app = builder.Build();
+//var app = builder.Build();
 
-app.UseMiddleware<GeneratorMiddleware>();
-app.UseMiddleware<ReaderMiddleware>();
+//app.UseMiddleware<GeneratorMiddleware>();
+//app.UseMiddleware<ReaderMiddleware>();
 
 //app.Run(async (context) => await context.Response.WriteAsync("Metanit"));
 
-app.Run();
+//app.Run();
 
 class GeneratorMiddleware
 {

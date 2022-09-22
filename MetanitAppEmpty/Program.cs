@@ -1,155 +1,288 @@
-﻿using System.Text.RegularExpressions;
+﻿using MetanitAppEmpty;
+using System.Text.RegularExpressions;
 
 
-List<Person> users = new List<Person>
-{
-    new() {Id = Guid.NewGuid().ToString(), Name = "Tom", Age = 37},
-    new() {Id = Guid.NewGuid().ToString(), Name = "Bob", Age = 23},
-    new() {Id = Guid.NewGuid().ToString(), Name = "Sam", Age = 33}
-};
+//List<Person> users = new List<Person>
+//{
+//    new() {Id = Guid.NewGuid().ToString(), Name = "Tom", Age = 37},
+//    new() {Id = Guid.NewGuid().ToString(), Name = "Bob", Age = 23},
+//    new() {Id = Guid.NewGuid().ToString(), Name = "Sam", Age = 33}
+//};
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Dva objekta dlja odnoj zavisimosti
+//builder.Services.AddTransient<IHelloService, RuHelloService>();
+//builder.Services.AddTransient<IHelloService, EnHelloService>();
+
+//var app = builder.Build();
+
+//app.UseMiddleware<HelloMiddleware>();
+
+//Odin object dlja neskolkih zavisimostrej
+builder.Services.AddSingleton<ValueStorage>();
+builder.Services.AddSingleton<IGenerator>(service => service.GetRequiredService<ValueStorage>());
+builder.Services.AddSingleton<IReader>(service => service.GetRequiredService<ValueStorage>());
+
 var app = builder.Build();
 
-app.Run(async (context) =>
-{
-    var response = context.Response;
-    var request = context.Request;
-    var path = request.Path;
+app.UseMiddleware<GeneratorMiddleware>();
+app.UseMiddleware<ReaderMiddleware>();
 
-    string expressionForGuid = @"^/api/users/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$";
-    if (path == "/api/users" && request.Method == "GET")
-    {
-        await GetAllPeople(response);
-    }
-    else if (Regex.IsMatch(path, expressionForGuid) && request.Method == "GET")
-    {
-        string? id = path.Value?.Split("/")[3];
-        await GetPerson(id, response);
-    }
-    else if (path == "/api/users" && request.Method == "PUT")
-    {
-        await UpdatePerson(response, request);
-    }
-    else if (path == "/api/users" && request.Method == "POST")
-    {
-        await CreatePerson(response, request);
-    }
-    else if (Regex.IsMatch(path, expressionForGuid) && request.Method == "DELETE")
-    {
-        string? id = path.Value?.Split("/")[3];
-        await DeleteUser(id, response);
-    }
-    else
-    {
-        response.ContentType = "text/html; charset=utf-8";
-        await response.SendFileAsync("html/index.html");
-    }
-
-});
-
-
+//app.Run(async (context) => await context.Response.WriteAsync("Metanit"));
 
 app.Run();
 
-
-async Task DeleteUser(string id, HttpResponse response)
+class GeneratorMiddleware
 {
-    
-        Person? user = users.FirstOrDefault(u => u.Id == id);
-        if (user != null)
-        {
-            users.Remove(user);
-            await response.WriteAsJsonAsync(user);
-        }
+    RequestDelegate next;
+    IGenerator generator;
+
+    public GeneratorMiddleware(RequestDelegate next, IGenerator generator)
+    {
+        this.next = next;
+        this.generator = generator;
+    }
+    public async Task InvokeAsync(HttpContext context)
+    {
+        if (context.Request.Path == "/generate")
+            await context.Response.WriteAsync($"New Value: {generator.GenerateValue()}");
         else
-        {
-            response.StatusCode = 400;
-            await response.WriteAsJsonAsync(new { message = "Wrong Data(delete)" });
-        }
-    
+            await next.Invoke(context);
+    }
 }
-
-async Task CreatePerson(HttpResponse response, HttpRequest request)
+class ReaderMiddleware
 {
-    try
+    IReader reader;
+
+    public ReaderMiddleware(RequestDelegate _, IReader reader) => this.reader = reader;
+
+    public async Task InvokeAsync(HttpContext context)
     {
-        Person? user = await request.ReadFromJsonAsync<Person>();
-        if (user != null)
-        {
-            user.Id = Guid.NewGuid().ToString();
-            users.Add(user);
-            await response.WriteAsJsonAsync(user);
-        }
-        else
-        {
-            throw new Exception("Wrong data(create)");
-        }
-    }
-    catch (Exception ex)
-    {
-        response.StatusCode = 400;
-        await response.WriteAsJsonAsync(new { message = "Wrong data(create)" });
+        await context.Response.WriteAsync($"Current Value: {reader.ReadValue()}");
     }
 }
 
-async Task GetAllPeople(HttpResponse response)
+interface IGenerator
 {
-    await response.WriteAsJsonAsync(users);
+    int GenerateValue();
 }
-async Task GetPerson(string? id, HttpResponse response)
+interface IReader
 {
-    Person? user = users.FirstOrDefault((u) => u.Id == id);
+    int ReadValue();
+}
+class ValueStorage : IGenerator, IReader
+{
+    int value;
+    public int GenerateValue()
+    {
+        value = new Random().Next();
+        return value;
+    }
 
-    if (user != null)
-    {
-        await response.WriteAsJsonAsync(user);
-    }
-    else
-    {
-        response.StatusCode = 404;
-        await response.WriteAsJsonAsync(new {message = "User not found"});
-    }
+    public int ReadValue() => value;
 }
 
-async Task UpdatePerson(HttpResponse response, HttpRequest request)
+interface IHelloService
 {
-    try
+    string Message { get; }
+}
+
+class RuHelloService : IHelloService
+{
+    public string Message => "Привет METANIT.COM";
+}
+class EnHelloService : IHelloService
+{
+    public string Message => "Hello METANIT.COM";
+}
+
+class HelloMiddleware
+{
+    readonly IEnumerable<IHelloService> helloServices;
+
+    public HelloMiddleware(RequestDelegate _, IEnumerable<IHelloService> helloServices)
     {
-        Person? userData = await request.ReadFromJsonAsync<Person>();
-        if (userData != null)
+        this.helloServices = helloServices;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        context.Response.ContentType = "text/html; charset=utf-8";
+        string responseText = "";
+        foreach (var service in helloServices)
         {
-            var user = users.FirstOrDefault(u => u.Id == userData.Id);
-
-            if (user != null)
-            {
-                user.Age = userData.Age;
-                user.Name = userData.Name;
-                await response.WriteAsJsonAsync(user);
-            }
-            else
-            {
-                response.StatusCode = 404;
-                await response.WriteAsJsonAsync(new { message = "User not found" });
-            }
+            responseText += $"<h3>{service.Message}</h3>";
         }
-        else
-        {
-            throw new Exception("Wrong data(update)");
-        }
-    }
-    catch (Exception ex)
-    {
-        response.StatusCode = 400;
-        await response.WriteAsJsonAsync(new { message = "Wrong data" });
+        await context.Response.WriteAsync(responseText);
     }
 }
 
-public class Person
+public interface ITimer
 {
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-        
-    public int Age { get; set; }
-    
+    string Time { get; }
 }
+public class Timer : ITimer
+{
+    public Timer()
+    {
+        Time = DateTime.Now.ToLongTimeString();
+    }
+    public string Time { get; }
+}
+public class TimeService
+{
+    private ITimer timer;
+    public TimeService(ITimer timer)
+    {
+        this.timer = timer;
+    }
+    public string GetTime() => timer.Time;
+}
+
+public interface ICounter
+{
+    int Value { get; }
+}
+
+public class RandomCounter : ICounter
+{
+    static Random rnd = new Random();
+    private int _value;
+    public RandomCounter()
+    {
+        _value = rnd.Next(0, 1000000);
+    }
+    public int Value
+    {
+        get => _value;
+    }
+}
+
+public class CounterService
+{
+    public ICounter Counter { get;}
+
+    public CounterService(ICounter counter)
+    {
+        Counter = counter;
+    }
+}
+
+public class CounterMiddleware
+{
+    RequestDelegate next;
+    int i = 0;
+    public CounterMiddleware(RequestDelegate next)
+    {
+        this.next = next;
+    }
+
+    public async Task InvokeAsync(HttpContext httpContext, ICounter counter, CounterService counterService)
+    {
+        i++;
+        httpContext.Response.ContentType = "text/html;charset=utf-8";
+        await httpContext.Response.WriteAsync($"Request {i}; Counter: {counter.Value}; Service: {counterService.Counter.Value}");
+    }
+}
+
+//async Task DeleteUser(string id, HttpResponse response)
+//{
+
+//        Person? user = users.FirstOrDefault(u => u.Id == id);
+//        if (user != null)
+//        {
+//            users.Remove(user);
+//            await response.WriteAsJsonAsync(user);
+//        }
+//        else
+//        {
+//            response.StatusCode = 400;
+//            await response.WriteAsJsonAsync(new { message = "Wrong Data(delete)" });
+//        }
+
+//}
+
+//async Task CreatePerson(HttpResponse response, HttpRequest request)
+//{
+//    try
+//    {
+//        Person? user = await request.ReadFromJsonAsync<Person>();
+//        if (user != null)
+//        {
+//            user.Id = Guid.NewGuid().ToString();
+//            users.Add(user);
+//            await response.WriteAsJsonAsync(user);
+//        }
+//        else
+//        {
+//            throw new Exception("Wrong data(create)");
+//        }
+//    }
+//    catch (Exception ex)
+//    {
+//        response.StatusCode = 400;
+//        await response.WriteAsJsonAsync(new { message = "Wrong data(create)" });
+//    }
+//}
+
+//async Task GetAllPeople(HttpResponse response)
+//{
+//    await response.WriteAsJsonAsync(users);
+//}
+//async Task GetPerson(string? id, HttpResponse response)
+//{
+//    Person? user = users.FirstOrDefault((u) => u.Id == id);
+
+//    if (user != null)
+//    {
+//        await response.WriteAsJsonAsync(user);
+//    }
+//    else
+//    {
+//        response.StatusCode = 404;
+//        await response.WriteAsJsonAsync(new {message = "User not found"});
+//    }
+//}
+
+//async Task UpdatePerson(HttpResponse response, HttpRequest request)
+//{
+//    try
+//    {
+//        Person? userData = await request.ReadFromJsonAsync<Person>();
+//        if (userData != null)
+//        {
+//            var user = users.FirstOrDefault(u => u.Id == userData.Id);
+
+//            if (user != null)
+//            {
+//                user.Age = userData.Age;
+//                user.Name = userData.Name;
+//                await response.WriteAsJsonAsync(user);
+//            }
+//            else
+//            {
+//                response.StatusCode = 404;
+//                await response.WriteAsJsonAsync(new { message = "User not found" });
+//            }
+//        }
+//        else
+//        {
+//            throw new Exception("Wrong data(update)");
+//        }
+//    }
+//    catch (Exception ex)
+//    {
+//        response.StatusCode = 400;
+//        await response.WriteAsJsonAsync(new { message = "Wrong data" });
+//    }
+//}
+
+//public class Person
+//{
+//    public string Id { get; set; } = "";
+//    public string Name { get; set; } = "";
+
+//    public int Age { get; set; }
+
+//}

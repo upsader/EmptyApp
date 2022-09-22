@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder();
 
 //builder.Services.Configure<RouteOptions>(options =>
 //    options.ConstraintMap.Add("secretcode", typeof(SecretCodeConstraint)));
@@ -18,26 +18,32 @@ var builder = WebApplication.CreateBuilder(args);
 //    {"age", "Surv" }
 //});
 
+builder.Logging.AddFile(Path.Combine(Directory.GetCurrentDirectory(), "logger.txt"));
+
+builder.Configuration.AddJsonFile("config.json");
+
 var app = builder.Build();
 
 
 
-//app.Map("/", builder =>
-//{
-//    builder.Run(async (context) => await context.Response.WriteAsync("awd"));
-//});
-
-app.Map("/", (IConfiguration appConfig) => $"{appConfig["name"]} - {appConfig["age"]}");
-
-app.Use(async (context, next) =>
+app.Run(async (context) =>
 {
-    await next();
-
+    app.Logger.LogInformation($"Path: {context.Request.Path}  Time:{DateTime.Now.ToLongTimeString()}");
+    app.Logger.Log(LogLevel.Warning, "TEST");
+    await context.Response.WriteAsync("Hello World!");
 });
+
+app.Map("/", (ILogger<Program> logger) =>
+{
+    logger.Log(LogLevel.Warning, $"Path: / {DateTime.Now.ToShortTimeString()}");
+    return "Hello";
+});
+
+
+app.Map("/time", (TimeService service) => $"Time: {service.GetTime()}");
 
 app.Run();
 
-app.Map("/time", (TimeService service) => $"Time: {service.GetTime()}");
 
 //app.Map("/users/{name:invalidnames}", (string name) => $"Name: {name}");
 

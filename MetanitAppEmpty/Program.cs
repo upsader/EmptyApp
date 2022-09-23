@@ -2,7 +2,9 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-var builder = WebApplication.CreateBuilder();
+var builder = WebApplication.CreateBuilder(
+        new WebApplicationOptions { WebRootPath = "wwwroot"}
+    );
 
 //builder.Services.Configure<RouteOptions>(options =>
 //    options.ConstraintMap.Add("secretcode", typeof(SecretCodeConstraint)));
@@ -69,6 +71,17 @@ app.UseStaticFiles();
 //    app.Logger.Log(LogLevel.Warning, "TEST");
 //    await context.Response.WriteAsync("Hello World!");
 //});
+
+app.Map("/upload", async () =>
+{
+    string path = "uploads/External_service.png";
+    byte[] fileContent = await File.ReadAllBytesAsync(path);
+    string contentType = "image/png";
+    string downloadName = "bred.png";
+    return Results.File(fileContent, contentType, downloadName);
+});
+
+app.Map("/hello", () => Results.Text("Hello world"));
 
 app.Map("/", (ILogger<Program> logger) =>
 {

@@ -44,3 +44,5 @@ C:\Users\upsad\Desktop\EmptyApp\MetanitAppEmpty\obj\Debug\net6.0\MetanitAppEmpty
 C:\Users\upsad\Desktop\EmptyApp\MetanitAppEmpty\obj\Debug\net6.0\ref\MetanitAppEmpty.dll
 C:\Users\upsad\Desktop\EmptyApp\MetanitAppEmpty\bin\Debug\net6.0\config.json
 C:\Users\upsad\Desktop\EmptyApp\MetanitAppEmpty\bin\Debug\net6.0\config.xml
+C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\bin\Debug\net6.0\config.json
+C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\bin\Debug\net6.0\config.xml

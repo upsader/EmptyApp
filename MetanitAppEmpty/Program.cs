@@ -10,13 +10,23 @@ var builder = WebApplication.CreateBuilder();
 // альтернативное добавление класса ограничения
 //builder.Services.AddRouting(options => options.ConstraintMap.Add("invalidnames", typeof(InvalidNamesConstraint)));
 
-//builder.Services.AddTransient<ITimer, Timer>();
-//builder.Services.AddTransient<TimeService>();
+builder.Services.AddTransient<ITimer, Timer>();
+builder.Services.AddTransient<TimeService>();
 //builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
 //{
 //    {"name", "Tom" },
 //    {"age", "Surv" }
 //});
+
+
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ",MyApp.Session";
+    options.IdleTimeout = TimeSpan.FromSeconds(3600);
+    options.Cookie.IsEssential = true;
+});
 
 builder.Logging.AddFile(Path.Combine(Directory.GetCurrentDirectory(), "logger.txt"));
 
@@ -24,14 +34,41 @@ builder.Configuration.AddJsonFile("config.json");
 
 var app = builder.Build();
 
-
-
-app.Run(async (context) =>
+app.UseStatusCodePages(async statusCodeContext =>
 {
-    app.Logger.LogInformation($"Path: {context.Request.Path}  Time:{DateTime.Now.ToLongTimeString()}");
-    app.Logger.Log(LogLevel.Warning, "TEST");
-    await context.Response.WriteAsync("Hello World!");
-});
+    var response = statusCodeContext.HttpContext.Response;
+    var path = statusCodeContext.HttpContext.Request.Path;
+
+    response.ContentType = "text/plain; charset=utf-8";
+    if (response.StatusCode == 403)
+    {
+        await response.WriteAsync($"Path: {path}. Access Denied");
+    }
+    else if (response.StatusCode == 404)
+    {
+        await response.WriteAsync($"Resource {path} Not found");
+    }
+}); //http error handler
+
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler(app => app.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync($"Error 500. DivideByZeroException occurred! Path: {context.Request.Path}");
+    }));
+}
+
+app.UseSession();
+app.UseStaticFiles();
+
+//app.Run(async (context) =>
+//{
+//    app.Logger.LogInformation($"Path: {context.Request.Path}  Time:{DateTime.Now.ToLongTimeString()}");
+//    app.Logger.Log(LogLevel.Warning, "TEST");
+//    await context.Response.WriteAsync("Hello World!");
+//});
 
 app.Map("/", (ILogger<Program> logger) =>
 {

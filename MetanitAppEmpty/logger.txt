@@ -1,1 +1,86 @@
 TEST
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+Error unprotecting the session cookie.
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+An unhandled exception has occurred while executing the request.
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+An unhandled exception has occurred while executing the request.
+An unhandled exception has occurred while executing the request.
+An unhandled exception has occurred while executing the request.
+An unhandled exception has occurred while executing the request.
+An unhandled exception has occurred while executing the request.
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+An unhandled exception has occurred while executing the request.
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+An unhandled exception has occurred while executing the request.
+An unhandled exception has occurred while executing the request.
+An unhandled exception has occurred while executing the request.
+An unhandled exception has occurred while executing the request.
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+An unhandled exception has occurred while executing the request.
+An unhandled exception has occurred while executing the request.
+An unhandled exception has occurred while executing the request.
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+Path: /about  Time:2:53:34 PM
+TEST
+Path: /aboutaa  Time:2:53:37 PM
+TEST
+Path: /ok  Time:2:53:44 PM
+TEST
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+An unhandled exception has occurred while executing the request.
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+Path: / 14:58:51
+An unhandled exception has occurred while executing the request.
+An unhandled exception has occurred while executing the request.
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\
+Now listening on: https://localhost:7094
+Now listening on: http://localhost:5094
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: C:\Users\olegs\source\repos\MetanitAppEmpty\MetanitAppEmpty\

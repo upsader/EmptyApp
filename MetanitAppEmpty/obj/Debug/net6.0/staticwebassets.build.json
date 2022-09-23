@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Ss/vnLF3mROpXPKHwFdE/s7UwSxorjeOykdleMtXn5c=",
+  "Hash": "OmkzjMjOiJUijrt/bi97mmvYFfUsQzyJ4E7JOqZZWw4=",
   "Source": "MetanitAppEmpty",
   "BasePath": "_content/MetanitAppEmpty",
   "Mode": "Default",
@@ -10,7 +10,7 @@
     {
       "Name": "MetanitAppEmpty\\wwwroot",
       "Source": "MetanitAppEmpty",
-      "ContentRoot": "C:\\Users\\upsad\\Desktop\\EmptyApp\\MetanitAppEmpty\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\olegs\\source\\repos\\MetanitAppEmpty\\MetanitAppEmpty\\wwwroot\\",
       "BasePath": "_content/MetanitAppEmpty",
       "Pattern": "**"
     }

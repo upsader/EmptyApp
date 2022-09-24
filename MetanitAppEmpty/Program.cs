@@ -2,71 +2,80 @@
 //using System.Text;
 //using System.Text.RegularExpressions;
 
-var users = new List<Person>
-{
-    new() { Id = Guid.NewGuid().ToString(), Name = "Tom", Age = 37 },
-    new() { Id = Guid.NewGuid().ToString(), Name = "Bob", Age = 41 },
-    new() { Id = Guid.NewGuid().ToString(), Name = "Sam", Age = 24 }
-};
+//var users = new List<Person>
+//{
+//    new() { Id = Guid.NewGuid().ToString(), Name = "Tom", Age = 37 },
+//    new() { Id = Guid.NewGuid().ToString(), Name = "Bob", Age = 41 },
+//    new() { Id = Guid.NewGuid().ToString(), Name = "Sam", Age = 24 }
+//};
 
+
+using MetanitAppEmpty;
+using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 
 var builder = WebApplication.CreateBuilder();
+
+string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.MapGet("/api/users", () =>
-{
-	return users;
-});
 
-app.MapGet("/api/users/{id}", (string id) =>
+app.MapGet("/api/users", async (ApplicationContext db) => await db.Users.ToListAsync());
+
+app.MapGet("/api/users/{id:int}", async (int id, ApplicationContext db) =>
 {
-	Person? user = users.Find(x => x.Id == id);
+	User? user =  await db.Users.FindAsync(id);
 
 	if (user == null) return Results.NotFound(new { message = "User not found" });
 
 	return Results.Json(user);
 });
 
-app.MapDelete("/api/users/{id}", (string id) =>
+app.MapDelete("/api/users/{id:int}", async (int id, ApplicationContext db) =>
 {
-	Person? user = users.Find(users => users.Id == id);
+	User? user = await db.Users.FindAsync(id);
 
 	if (user == null) return Results.NotFound(new { message = "User does not exist" });
 
-	users.Remove(user);
-	return Results.Json(user);
+	db.Users.Remove(user);
+    await db.SaveChangesAsync();
+    return Results.Json(user);
 });
 
-app.MapPost("/api/users/", (Person user) =>
+app.MapPost("/api/users/", async (User user, ApplicationContext db) =>
 {
-	user.Id = Guid.NewGuid().ToString();
-	users.Add(user);
-	return Results.Json(user);
+	await db.Users.AddAsync(user);
+    await db.SaveChangesAsync();
+    return Results.Json(user);
 });
 
-app.MapPut("/api/users", (Person userData) =>
+app.MapPut("/api/users", async (User userData, ApplicationContext db) =>
 {
-	Person? user = users.Find(users => users.Id == userData.Id);
+	User? user = await db.Users.FindAsync(userData.Id);
 
 	if (user == null) return Results.NotFound(new { message = "User does not exist" });
 
 	user.Name = userData.Name;
 	user.Age = userData.Age;
 
-	return Results.Json(user);
+    await db.SaveChangesAsync();
+
+    return Results.Json(user);
 });
 
 app.Run();
-public class Person
-{
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-    public int Age { get; set; }
-}
+//public class Person
+//{
+//    public string Id { get; set; } = "";
+//    public string Name { get; set; } = "";
+//    public int Age { get; set; }
+//}
 
 //var builder = WebApplication.CreateBuilder(
 //        new WebApplicationOptions { WebRootPath = "wwwroot"}
